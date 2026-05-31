@@ -2,3 +2,5 @@ trustPolicy: no-downgrade
 trustPolicyIgnoreAfter: 525600
 onlyBuiltDependencies:
   - esbuild
+allowBuilds:
+  esbuild: false
