@@ -55,18 +55,21 @@ Why this matters:
   OpenAPI schema; a backend change surfaces as a TypeScript error after
   regenerating.
 - **Uniform errors.** Every endpoint failure becomes an `ApiError` with a
-  `status` and the backend's `{ error }` message, so query/mutation error
-  handling is identical everywhere.
+  `status` and the backend's `{ error }` message.
 - **Swappable UI.** Components depend on `data/*`, not on `openapi-fetch` or
   query keys, so they can be rewritten without touching the data layer.
 
 ## Getting started
 
 ```bash
-npm install
-npm run gen:api      # regenerate src/api/schema.d.ts from openapi.json
-npm run dev          # http://localhost:5173
+pnpm install         # or: npm install
+pnpm gen:api         # regenerate src/api/schema.d.ts from openapi.json
+pnpm dev             # http://localhost:5173
 ```
+
+> Both `pnpm-lock.yaml` and `package-lock.json` are committed, so **pnpm or npm**
+> both work. `package.json` is the source of truth — if you change deps, refresh
+> the lockfile for whichever manager you use.
 
 ### CORS / the dev proxy
 
@@ -86,16 +89,31 @@ errors. Override the proxy target with `VITE_API_PROXY_TARGET` (see
 In **production** point `VITE_API_BASE_URL` at a same-origin reverse proxy, or
 at the backend directly once it serves CORS headers.
 
+### pnpm & supply-chain trust
+
+`pnpm-workspace.yaml` tunes pnpm 11's trust policy. The default
+`trustPolicy: no-downgrade` check is date-based across all majors, so it flags
+old, provenance-less transitive deps (e.g. `semver@6.3.1` via `@babel/core`) as
+"trust downgrades" — a false positive. `trustPolicyIgnoreAfter` skips the check
+for packages older than ~1 year, which clears those while keeping protection for
+fresh releases. `onlyBuiltDependencies` re-enables esbuild's install script
+(pnpm blocks build scripts by default).
+
+> TypeScript is pinned to `^5.9.3` because `openapi-typescript@7` declares a
+> peer of `typescript@^5`; TS 6 triggers an `ERESOLVE` / peer conflict.
+
 ## Scripts
 
-| Script                   | Description                                            |
-| ------------------------ | ------------------------------------------------------ |
-| `npm run dev`            | Start the dev server with the API proxy.               |
-| `npm run build`          | Typecheck (`tsc --noEmit`) then build with Vite.       |
-| `npm run preview`        | Preview the production build.                           |
-| `npm run typecheck`      | Type-check only.                                        |
-| `npm run gen:api`        | Generate `src/api/schema.d.ts` from local `openapi.json`. |
-| `npm run gen:api:remote` | Regenerate types from the live `/openapi.json`.        |
+| Script                | Description                                            |
+| --------------------- | ------------------------------------------------------ |
+| `pnpm dev`            | Start the dev server with the API proxy.               |
+| `pnpm build`          | Typecheck (`tsc --noEmit`) then build with Vite.       |
+| `pnpm preview`        | Preview the production build.                           |
+| `pnpm typecheck`      | Type-check only.                                        |
+| `pnpm gen:api`        | Generate `src/api/schema.d.ts` from local `openapi.json`. |
+| `pnpm gen:api:remote` | Regenerate types from the live `/openapi.json`.        |
+
+(Swap `pnpm` for `npm run` if you prefer npm.)
 
 ## Regenerating the API contract
 
@@ -104,7 +122,7 @@ the generated types:
 
 ```bash
 curl -s http://backen-loadb-j1ck0azqzxit-200572918.eu-central-1.elb.amazonaws.com/openapi.json -o openapi.json
-npm run gen:api
+pnpm gen:api
 ```
 
 [Gleam AWS Example API]: http://backen-loadb-j1ck0azqzxit-200572918.eu-central-1.elb.amazonaws.com/docs
