@@ -1,0 +1,28 @@
+{
+  "name": "frontend-aws-gleam-example",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Data-driven SolidJS frontend for the Gleam AWS Example API (openapi-fetch + TanStack Solid Query).",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "gen:api": "openapi-typescript ./openapi.json -o ./src/api/schema.d.ts",
+    "gen:api:remote": "openapi-typescript http://backen-loadb-j1ck0azqzxit-200572918.eu-central-1.elb.amazonaws.com/openapi.json -o ./src/api/schema.d.ts"
+  },
+  "dependencies": {
+    "@tanstack/solid-query": "^5.100.14",
+    "openapi-fetch": "^0.17.0",
+    "solid-js": "^1.9.13"
+  },
+  "devDependencies": {
+    "@tanstack/solid-query-devtools": "^5.100.14",
+    "@types/node": "^25.9.1",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^6.0.3",
+    "vite": "^6.4.2",
+    "vite-plugin-solid": "^2.11.12"
+  }
+}
